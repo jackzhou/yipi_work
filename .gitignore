@@ -2,3 +2,9 @@ home_work/
 venv/
 .venv/
 .DS_Store
+data/processed/*.parquet
+*duckdb*
+*.duckdb  
+*.db  
+*.sqlite  
+*.duckdb-wal
