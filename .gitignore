@@ -8,7 +8,8 @@ data/processed/*.parquet
 *.db  
 *.sqlite  
 *.duckdb-wal
-# Python compiled files
+# Python compiled files (anywhere in the tree)
+**/__pycache__/
 __pycache__/
 *.pyc
 *.pyo

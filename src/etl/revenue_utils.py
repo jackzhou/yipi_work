@@ -1,3 +1,4 @@
+# src/etl/revenue_utils.py
 """Revenue string parsing and approximate USD normalization."""
 
 from __future__ import annotations
@@ -98,12 +99,12 @@ def _single_to_usd(text: str) -> float:
     return native * CURRENCY_TO_USD[currency]
 
 
-def dollor_reveue(revenue: str | float | None) -> int:
+def dollar_revenue(revenue: str | float | None) -> int:
     """
     Clean revenue string → approximate USD integer.
 
     - Converts EUR / GBP / JPY using ``CURRENCY_TO_USD``.
-    - Range strings ``a - b`` use the midpoint (each side parsed, then averaged in USD).
+    - Range strings ``a - b`` or ``a-b`` (e.g. ``$10M - $20M``, ``5M-10M``) use the midpoint.
     - Parses B/M/K, ``billion`` / ``million``, and comma-separated numbers.
     - Missing / N/A / Not disclosed → 0.
     """
@@ -119,5 +120,15 @@ def dollor_reveue(revenue: str | float | None) -> int:
         left, right = s.split(" - ", 1)
         usd = (_single_to_usd(left) + _single_to_usd(right)) / 2.0
         return int(round(usd))
+
+    if "-" in s:
+        idx = s.find("-")
+        left, right = s[:idx].strip(), s[idx + 1 :].strip()
+        if left and right:
+            try:
+                usd = (_single_to_usd(left) + _single_to_usd(right)) / 2.0
+                return int(round(usd))
+            except ValueError:
+                pass
 
     return int(round(_single_to_usd(s)))
