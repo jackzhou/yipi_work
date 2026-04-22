@@ -6,7 +6,7 @@ pd.set_option("display.max_columns", None)
 pd.set_option("display.max_rows", None)
 pd.set_option("display.width", None)
 df = enrich(df).drop(columns=["summary", "title"])
-print(df[["company_name", "original_company_name"]])
+print(df[["company_name", "original_company_name", "company_age", "company_size_category", "employee_count", 'founded_year', 'published_date', 'year']])
 # Print the first row where "company_name" and "original_company_name" are not the same
 diff_rows = df[df["company_name"] != df["original_company_name"]]
 if not diff_rows.empty:

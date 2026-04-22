@@ -33,6 +33,41 @@ def _nonblank_series(s: pd.Series) -> pd.Series:
     return s.notna() & (s.astype(str).str.strip() != "")
 
 
+def _size_category(count: object) -> str:
+    if pd.isna(count):
+        return "Unknown"
+    try:
+        cnt = int(count)
+    except (TypeError, ValueError):
+        return "Unknown"
+    if cnt < 10_000:
+        return "Small"
+    if cnt <= 30_000:
+        return "Medium"
+    return "Large"
+
+
+def _add_derived_company_fields(df: pd.DataFrame) -> pd.DataFrame:
+    """Add ``company_age`` and ``company_size_category`` from merged metadata + article dates."""
+    out = df.copy()
+    if "founded_year" in out.columns and "published_date" in out.columns:
+        pub_year = pd.to_datetime(out["published_date"], errors="coerce").dt.year.astype(
+            "Int64"
+        )
+        founded = pd.to_numeric(out["founded_year"], errors="coerce").astype("Int64")
+        delta = pub_year - founded
+        # Drop impossible chronology (article year before founded_year)
+        out["company_age"] = delta.where(delta.isna() | (delta >= 0), pd.NA)
+    else:
+        out["company_age"] = pd.Series(pd.NA, index=out.index, dtype="Int64")
+
+    if "employee_count" in out.columns:
+        out["company_size_category"] = out["employee_count"].map(_size_category)
+    else:
+        out["company_size_category"] = "Unknown"
+    return out
+
+
 class CompanyEnrich:
     """Load company metadata, canonicalize names, merge onto news rows, list unmatched processed names."""
 
@@ -127,7 +162,7 @@ class CompanyEnrich:
             .rename(columns={"company_name_x": "original_company_name"})
             .rename(columns={"canonical_company_name": "company_name"})
         )
-        return out
+        return _add_derived_company_fields(out)
 
     def unmatched_names(self) -> list[str]:
         """

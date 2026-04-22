@@ -1,4 +1,4 @@
-# tests/etl/test_company_name.py
+# tests/etl/test_enrich.py
 """Tests for ``src.etl.enrich``."""
 
 from __future__ import annotations
@@ -190,3 +190,77 @@ def test_enrich_yields_known_company_names(tmp_path) -> None:
         val = getattr(row, "company_name")
         if isinstance(val, str) and val.strip() and val != "UNKNOWN":
             assert val in known, f"Unexpected company_name {val!r} in enriched output"
+
+
+_RAW_TECH_NEWS = COMPANY_METADATA_JSON_PATH.parent / "tech_news.csv"
+
+
+def test_company_age_non_negative_on_raw_tech_news() -> None:
+    """``data/raw/tech_news.csv``: every finite ``company_age`` is >= 0."""
+    raw = pd.read_csv(_RAW_TECH_NEWS)
+    out = enrich(raw)
+    assert "company_age" in out.columns
+    ages = out["company_age"].dropna()
+    assert len(ages) > 0
+    assert (ages >= 0).all()
+
+
+def test_company_age_expected_for_fixture(tmp_path) -> None:
+    """Known ``published_date`` year minus ``founded_year`` after merge."""
+    meta = tmp_path / "meta.json"
+    meta.write_text(
+        json.dumps(
+            {
+                "FixtureCo": {
+                    "founded_year": 2000,
+                    "headquarters": "X",
+                    "employee_count": 100,
+                    "industry": "Tech",
+                    "is_public": True,
+                    "stock_ticker": None,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    news = pd.DataFrame(
+        {
+            "company_name": ["FixtureCo", "FixtureCo"],
+            "published_date": ["2020-06-01", "2025-01-01"],
+        }
+    )
+    out = CompanyEnrich(meta, news).enrich(news)
+    assert out["company_age"].tolist() == [20, 25]
+    assert (out["company_age"] >= 0).all()
+
+
+@pytest.mark.parametrize(
+    "employee_count,expected",
+    [
+        (5_000, "Small"),
+        (20_000, "Medium"),
+        (50_000, "Large"),
+    ],
+)
+def test_company_size_category_buckets(tmp_path, employee_count: int, expected: str) -> None:
+    meta = tmp_path / "meta.json"
+    meta.write_text(
+        json.dumps(
+            {
+                "SizeCo": {
+                    "founded_year": 2010,
+                    "headquarters": "Y",
+                    "employee_count": employee_count,
+                    "industry": "Tech",
+                    "is_public": False,
+                    "stock_ticker": None,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    news = pd.DataFrame(
+        {"company_name": ["SizeCo"], "published_date": ["2020-01-01"]}
+    )
+    out = CompanyEnrich(meta, news).enrich(news)
+    assert out["company_size_category"].iloc[0] == expected
