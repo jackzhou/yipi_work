@@ -2,7 +2,7 @@ home_work/
 venv/
 .venv/
 .DS_Store
-data/processed/*.parquet
+data/processed/
 *duckdb*
 *.duckdb  
 *.db  
