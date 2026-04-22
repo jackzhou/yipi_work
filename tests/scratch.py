@@ -1,11 +1,17 @@
 import io
 import json
+import sys
 from contextlib import redirect_stdout
 from pathlib import Path
 
 import pandas as pd
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from src.etl.company_name import unmatched_names
+
 _OUTPUT_PATH = _REPO_ROOT / "data" / "processed" / "data.txt"
 _METADATA_PATH = _REPO_ROOT / "data" / "raw" / "company_metadata.json"
 
@@ -95,3 +101,11 @@ text = buf.getvalue()
 _OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 _OUTPUT_PATH.write_text(text, encoding="utf-8")
 print(text)
+
+_unmatched = unmatched_names()
+print("\nUnmatched company names (processed_news.csv vs company_metadata.json):\n")
+if not _unmatched:
+    print("(none)")
+else:
+    for _name in _unmatched:
+        print(_name)
