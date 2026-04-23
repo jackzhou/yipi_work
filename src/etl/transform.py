@@ -29,10 +29,9 @@ def _revenue_cell_to_usd(value: object) -> int:
 
 
 def _process_publish_data(df: pd.DataFrame) -> pd.DataFrame:
-    """Preserve raw ``published_date`` as ``original_data``, parse dates, add year/month/quarter, reorder columns."""
     _published_raw = df["published_date"]
     df = df.copy()
-    df["original_data"] = _published_raw.map(
+    df["original_published_date"] = _published_raw.map(
         lambda v: "" if pd.isna(v) else str(v).strip()
     )
     df["published_date"] = _published_raw.apply(parse_published_date)
@@ -44,9 +43,9 @@ def _process_publish_data(df: pd.DataFrame) -> pd.DataFrame:
 
     _ymq = ["year", "month", "quarter"]
     cols_wo_ymq = [c for c in df.columns if c not in _ymq]
-    cols_wo_ymq.remove("original_data")
+    cols_wo_ymq.remove("original_published_date")
     _ins = cols_wo_ymq.index("published_date")
-    ordered = cols_wo_ymq[:_ins] + ["original_data"] + cols_wo_ymq[_ins:]
+    ordered = cols_wo_ymq[:_ins] + ["original_published_date"] + cols_wo_ymq[_ins:]
     _after_pub = ordered.index("published_date") + 1
     return df[ordered[:_after_pub] + _ymq + ordered[_after_pub:]]
 
@@ -118,13 +117,3 @@ def run_flow(
     return Path(csv_s), Path(pq_s)
 
 
-def load_news_data() -> tuple[Path, Path]:
-    """Run the default pipeline (repo ``data/raw/tech_news.csv`` + ``company_metadata.json``)."""
-    return run_flow(
-        _REPO_ROOT / "data" / "raw" / "tech_news.csv",
-        COMPANY_METADATA_JSON_PATH,
-    )
-
-
-def hello_data() -> None:
-    logger.info("hello data")
