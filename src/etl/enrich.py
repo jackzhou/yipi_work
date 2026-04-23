@@ -152,7 +152,6 @@ class CompanyEnrich:
         return alias[best_alias] if score > 80 else "UNKNOWN"
 
     def enrich(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Add ``canonical_company_name`` / metadata columns; rename to ``company_name`` + ``original_company_name``."""
         meta = self.load_metadata()
         out = df.copy()
         out["canonical_company_name"] = out["company_name"].map(self.canonical_company_name)

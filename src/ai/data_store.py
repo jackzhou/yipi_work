@@ -10,7 +10,7 @@ import duckdb
 import pandas as pd
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_DUCKDB_PATH = _REPO_ROOT / "articles_embeddings.duckdb"
+DEFAULT_DUCKDB_PATH = _REPO_ROOT / "data" /"tech_news.duckdb"
 TABLE_NAME = "articles"
 
 

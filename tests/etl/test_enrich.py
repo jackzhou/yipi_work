@@ -122,7 +122,7 @@ def test_unmatched_names_against_temp_files(tmp_path) -> None:
 
 
 def test_enrich_default_wrapper_smoke() -> None:
-    df = pd.read_csv(COMPANY_METADATA_JSON_PATH.parents[1] / "processed" / "processed_news.csv")
+    df = pd.read_csv(COMPANY_METADATA_JSON_PATH.parents[1] / "raw" / "tech_news.csv")
     out = enrich(df)
     assert "original_company_name" in out.columns
     assert "company_name" in out.columns
