@@ -73,7 +73,7 @@ def export_final_file() -> None:
 
     """
 
-    export_with_top_similar_articles(query, ROOT / "output" / "ai_articles_enriched.parquet")
+    export_with_top_similar_articles(query, ROOT / "output" / "ai_articles_enriched.csv")
 
 
 

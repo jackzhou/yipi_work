@@ -2,33 +2,19 @@
 
 This project (yipit_work) implements an end-to-end ETL and AI enrichment pipeline.
 
-## Repository layout
+## Prequest
 
-```
-yipit_work/
-│
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── db/
-│
-├── src/
-│   ├── etl/
-│   ├── ai/
-│   ├── db/
-│   └── common/
-│
-├── output/
-│
-├── main_etl.py
-├── main_ai.py
-│
-├── create_venv.sh
-├── install_deps.sh
-├── requirements.txt
-│
-├── README.md
-├── EXPLAIN.md
-│
-└── .gitignore
-```
+- python 3.11
+
+## Install
+
+- create a virtual environment with  python 3.11.  se example in create_venv.sh
+- run pip install reqiremts see example in install_deps,sh
+
+## Run Tests:
+
+- pytest
+
+## Run Whole workflow
+
+./run_all.sh
