@@ -15,7 +15,7 @@ The provided `company_metadata.json` contains inconsistencies between the `is_pu
 ### Resolution Strategy
 
 - If `stock_ticker` is present and `is_public` is `false`, then:
-  - `**is_public` is set to `true**` (the ticker is kept as given).
+  - `is_public` is set to `true` (the ticker is kept as given).
 
 ### On Category and Industry Joins
 
