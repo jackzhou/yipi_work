@@ -2,6 +2,8 @@
 
 This project (yipit_work) implements an end-to-end ETL and AI enrichment pipeline.
 
+For a full code walkthrough (ETL → embeddings → export), see **[PROJECT_WALKTHROUGH.md](PROJECT_WALKTHROUGH.md)**.
+
 ## Exported CSV file location
 
 **`output/ai_articles_enriched.csv`** (relative to the repository root)
